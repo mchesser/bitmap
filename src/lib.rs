@@ -22,9 +22,9 @@ impl Bitmap {
 
         // Note: Pixel order for bitmaps is (blue, green, red)
         let (r, g, b) = color;
-        *self.pixels.get_mut(i + 0) = r;
+        *self.pixels.get_mut(i + 0) = b;
         *self.pixels.get_mut(i + 1) = g;
-        *self.pixels.get_mut(i + 2) = b;
+        *self.pixels.get_mut(i + 2) = r;
     }
 
     /// Write the stored data to a file with given filename
