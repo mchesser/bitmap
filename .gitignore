@@ -1,12 +1,11 @@
 # Object files
 *.o
 *.ko
-*.obj
-*.elf
 
 # Libraries
 *.lib
 *.a
+*.rlib
 
 # Shared objects (inc. Windows DLLs)
 *.dll
@@ -18,6 +17,6 @@
 *.exe
 *.out
 *.app
-*.i*86
-*.x86_64
-*.hex
+
+# Cargo
+target/

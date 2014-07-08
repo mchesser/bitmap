@@ -1,0 +1,86 @@
+#![crate_name = "bitmap"]
+#![crate_type = "lib"]
+
+use std::io;
+
+/// Main bitmap structure
+pub struct Bitmap {
+    pub width:  uint,
+    pub height: uint,
+    pixels: Vec<u8>,
+}
+
+impl Bitmap {
+    /// Set a pixel at x,y to a specified color
+    /// # Arugments
+    /// `x` - x coordinate
+    /// `y` - y coordinate
+    /// `color` - color values in the form (r, g, b)
+    pub fn set_pixel(&mut self, x: uint, y: uint, color: (u8, u8, u8)) {
+        // Calculate the byte offset for x
+        let i = (self.height - y - 1) * (self.width * 3) + x * 3;
+
+        // Note: Pixel order for bitmaps is (blue, green, red)
+        let (r, g, b) = color;
+        *self.pixels.get_mut(i + 0) = r;
+        *self.pixels.get_mut(i + 1) = g;
+        *self.pixels.get_mut(i + 2) = b;
+    }
+
+    /// Write the stored data to a file with given filename
+    /// # Arguments
+    /// `filename` - the file name to save the file to
+    pub fn write_to_file(&self, filename: &str) -> io::IoResult<()> {
+        static FILE_HEADER_SIZE:  u32 = 14;
+        static BMP_INFO_SIZE:     u32 = 40;
+        static TOTAL_HEADER_SIZE: u32 = FILE_HEADER_SIZE + BMP_INFO_SIZE;
+
+        let image_size = (self.height * self.width*3 + self.height * (self.width % 4)) as u32;
+        let file_size = image_size + TOTAL_HEADER_SIZE;
+
+        // Bitmap file header
+        let file_header: [u8, ..FILE_HEADER_SIZE] = [
+            'B' as u8, 'M' as u8,
+            file_size as u8, (file_size>>8) as u8, (file_size>>16) as u8, (file_size>>24) as u8,
+            0, 0,
+            0, 0,
+            TOTAL_HEADER_SIZE as u8, 0, 0, 0
+        ];
+        // Bitmap information header
+        let info_header: [u8, ..BMP_INFO_SIZE] = [
+            BMP_INFO_SIZE as u8, 0, 0, 0,
+            self.width as u8, (self.width>>8) as u8, (self.width>>16) as u8, (self.width>>24) as u8,
+            self.height as u8, (self.height>>8) as u8, (self.height>>16) as u8, (self.height>>24) as u8,
+            1, 0,
+            24, 0,
+            0, 0, 0, 0,
+            image_size as u8, (image_size>>8) as u8, (image_size>>16) as u8, (image_size>>24) as u8,
+            72, 0, 0, 0,
+            72, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0
+        ];
+
+        // Set up the file writer
+        let mut file = io::File::create(&Path::new(filename));
+
+        // Write the bitmap headers to file
+        try!(file.write(file_header));
+        try!(file.write(info_header));
+
+        // Write data to file
+        file.write(self.pixels.as_slice())
+    }
+
+    /// Create a new bitmap
+    /// # Arguments
+    /// `width` - the width of the bitmap
+    /// `height` - the height of the bitmap
+    pub fn new(width: uint, height: uint) -> Bitmap {
+        Bitmap {
+            width:  width,
+            height: height,
+            pixels: Vec::from_elem(height * (width * 3 + width % 4), 0u8)
+        }
+    }
+}
