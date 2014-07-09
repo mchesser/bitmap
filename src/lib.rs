@@ -5,31 +5,54 @@ use std::io;
 
 /// Main bitmap structure
 pub struct Bitmap {
-    pub width:  uint,
-    pub height: uint,
+    // The width of the bitmap in pixels, as an unsigned integer (4 bytes).
+    width:  i32,
+
+    // The height of the bitmap in pixels, as an unsigned integer (4 bytes).
+    height: i32,
+
+    // The pixel array, each row of the array is padded to 4 bytes in size.
     pixels: Vec<u8>,
 }
 
 impl Bitmap {
-    /// Set a pixel at x,y to a specified color
-    /// # Arugments
-    /// `x` - x coordinate
-    /// `y` - y coordinate
-    /// `color` - color values in the form (r, g, b)
-    pub fn set_pixel(&mut self, x: uint, y: uint, color: (u8, u8, u8)) {
-        // Calculate the byte offset for x
-        let i = (self.height - y - 1) * (self.width * 3) + x * 3;
+    /// Create a new blank (white) bitmap of a specified size.
+    ///
+    /// # Arguments
+    /// `width` - The width of the bitmap.
+    /// `height` - The height of the bitmap.
+    pub fn new(width: i32, height: i32) -> Bitmap {
+        Bitmap {
+            width:  width,
+            height: height,
 
-        // Note: Pixel order for bitmaps is (blue, green, red)
+            // Create a vector to store the pixels in, ensuring that it is padded to a multiple of 4
+            // bytes of each row.
+            pixels: Vec::from_elem((height * (width * 3 + width % 4)) as uint, 0xFFu8)
+        }
+    }
+
+    /// Set a pixel at (x, y) to a specified color.
+    ///
+    /// # Arguments
+    /// `x` - The x coordinate of the pixel.
+    /// `y` - The y coordinate of the pixel.
+    /// `color` - color values in the form (r, g, b).
+    pub fn set_pixel(&mut self, x: i32, y: i32, color: (u8, u8, u8)) {
+        // Calculate the byte offset for x
+        let i = ((self.height - y - 1) * (self.width * 3) + x * 3) as uint;
+
         let (r, g, b) = color;
+        // Note: Pixel order for bitmaps is (blue, green, red)
         *self.pixels.get_mut(i + 0) = b;
         *self.pixels.get_mut(i + 1) = g;
         *self.pixels.get_mut(i + 2) = r;
     }
 
-    /// Write the stored data to a file with given filename
+    /// Write the stored data to a file with given filename.
+    ///
     /// # Arguments
-    /// `filename` - the file name to save the file to
+    /// `filename` - The filename of the target file.
     pub fn write_to_file(&self, filename: &str) -> io::IoResult<()> {
         static FILE_HEADER_SIZE:  u32 = 14;
         static BMP_INFO_SIZE:     u32 = 40;
@@ -72,15 +95,13 @@ impl Bitmap {
         file.write(self.pixels.as_slice())
     }
 
-    /// Create a new bitmap
-    /// # Arguments
-    /// `width` - the width of the bitmap
-    /// `height` - the height of the bitmap
-    pub fn new(width: uint, height: uint) -> Bitmap {
-        Bitmap {
-            width:  width,
-            height: height,
-            pixels: Vec::from_elem(height * (width * 3 + width % 4), 0u8)
-        }
+    /// Get the width of the bitmap.
+    pub fn width(&self) -> i32 {
+        self.width
+    }
+
+    /// Get the height of the bitmap.
+    pub fn height(&self) -> i32 {
+        self.height
     }
 }
