@@ -1,10 +1,8 @@
 [package]
-
 name = "bitmap"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["Michael Chesser"]
 
-[[lib]]
-
+[lib]
 name = "bitmap"
 path = "src/lib.rs"
