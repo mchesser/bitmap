@@ -11,7 +11,7 @@ impl Bitmap {
     /// Create a new blank (white) bitmap of a specified size.
     pub fn new(width: i32, height: i32) -> Bitmap {
         Bitmap {
-            width:  width,
+            width: width,
             height: height,
             // Create a vector to store the pixels in, ensuring that it is padded to a multiple of 4
             // bytes of each row.
@@ -26,9 +26,9 @@ impl Bitmap {
 
         let (r, g, b) = color;
         // Note: Pixel order for bitmaps is (blue, green, red)
-        *self.pixels.get_mut(i + 0) = b;
-        *self.pixels.get_mut(i + 1) = g;
-        *self.pixels.get_mut(i + 2) = r;
+        self.pixels[i + 0] = b;
+        self.pixels[i + 1] = g;
+        self.pixels[i + 2] = r;
     }
 
     /// Write the stored data to a file with given filename.
