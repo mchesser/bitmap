@@ -67,11 +67,11 @@ impl Bitmap {
         let mut file = io::File::create(&Path::new(filename));
 
         // Write the bitmap headers to file
-        try!(file.write(file_header));
-        try!(file.write(info_header));
+        try!(file.write(&file_header));
+        try!(file.write(&info_header));
 
         // Write data to file
-        file.write(self.pixels.as_slice())
+        file.write(&*self.pixels)
     }
 
     /// Get the width of the bitmap.
