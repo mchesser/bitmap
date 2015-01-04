@@ -1,4 +1,5 @@
 use std::io;
+use std::iter;
 
 /// Main bitmap structure
 pub struct Bitmap {
@@ -15,7 +16,7 @@ impl Bitmap {
             height: height,
             // Create a vector to store the pixels in, ensuring that it is padded to a multiple of 4
             // bytes of each row.
-            pixels: Vec::from_elem((height * (width * 3 + width % 4)) as uint, 0xFFu8)
+            pixels: iter::repeat(0xFF).take((height * (width * 3 + width % 4)) as uint).collect(),
         }
     }
 
@@ -41,7 +42,7 @@ impl Bitmap {
         let file_size = image_size + TOTAL_HEADER_SIZE;
 
         // Bitmap file header
-        let file_header: [u8, ..FILE_HEADER_SIZE as uint] = [
+        let file_header: [u8; FILE_HEADER_SIZE as uint] = [
             'B' as u8, 'M' as u8,
             file_size as u8, (file_size>>8) as u8, (file_size>>16) as u8, (file_size>>24) as u8,
             0, 0,
@@ -49,7 +50,7 @@ impl Bitmap {
             TOTAL_HEADER_SIZE as u8, 0, 0, 0
         ];
         // Bitmap information header
-        let info_header: [u8, ..BMP_INFO_SIZE as uint] = [
+        let info_header: [u8; BMP_INFO_SIZE as uint] = [
             BMP_INFO_SIZE as u8, 0, 0, 0,
             self.width as u8, (self.width>>8) as u8, (self.width>>16) as u8, (self.width>>24) as u8,
             self.height as u8, (self.height>>8) as u8, (self.height>>16) as u8, (self.height>>24) as u8,
