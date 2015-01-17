@@ -16,14 +16,14 @@ impl Bitmap {
             height: height,
             // Create a vector to store the pixels in, ensuring that it is padded to a multiple of 4
             // bytes of each row.
-            pixels: iter::repeat(0xFF).take((height * (width * 3 + width % 4)) as uint).collect(),
+            pixels: iter::repeat(0xFF).take((height * (width * 3 + width % 4)) as usize).collect(),
         }
     }
 
     /// Set a pixel at (x, y) to a specified color (r, g, b).
     pub fn set_pixel(&mut self, x: i32, y: i32, color: (u8, u8, u8)) {
         // Calculate the byte offset for x
-        let i = ((self.height - y - 1) * (self.width * 3) + x * 3) as uint;
+        let i = ((self.height - y - 1) * (self.width * 3) + x * 3) as usize;
 
         let (r, g, b) = color;
         // Note: Pixel order for bitmaps is (blue, green, red)
@@ -34,15 +34,15 @@ impl Bitmap {
 
     /// Write the stored data to a file with given filename.
     pub fn write_to_file(&self, filename: &str) -> io::IoResult<()> {
-        const FILE_HEADER_SIZE: u32 = 14;
-        const BMP_INFO_SIZE: u32 = 40;
-        const TOTAL_HEADER_SIZE: u32 = FILE_HEADER_SIZE + BMP_INFO_SIZE;
+        const FILE_HEADER_SIZE: usize = 14;
+        const BMP_INFO_SIZE: usize = 40;
+        const TOTAL_HEADER_SIZE: usize = FILE_HEADER_SIZE + BMP_INFO_SIZE;
 
-        let image_size = (self.height * self.width*3 + self.height * (self.width % 4)) as u32;
+        let image_size = (self.height * self.width*3 + self.height * (self.width % 4)) as usize;
         let file_size = image_size + TOTAL_HEADER_SIZE;
 
         // Bitmap file header
-        let file_header: [u8; FILE_HEADER_SIZE as uint] = [
+        let file_header: [u8; FILE_HEADER_SIZE] = [
             'B' as u8, 'M' as u8,
             file_size as u8, (file_size>>8) as u8, (file_size>>16) as u8, (file_size>>24) as u8,
             0, 0,
@@ -50,7 +50,7 @@ impl Bitmap {
             TOTAL_HEADER_SIZE as u8, 0, 0, 0
         ];
         // Bitmap information header
-        let info_header: [u8; BMP_INFO_SIZE as uint] = [
+        let info_header: [u8; BMP_INFO_SIZE] = [
             BMP_INFO_SIZE as u8, 0, 0, 0,
             self.width as u8, (self.width>>8) as u8, (self.width>>16) as u8, (self.width>>24) as u8,
             self.height as u8, (self.height>>8) as u8, (self.height>>16) as u8, (self.height>>24) as u8,
