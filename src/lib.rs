@@ -1,9 +1,10 @@
-use std::io;
+#![feature(io, path)]
+use std::old_io::{self, File};
 use std::iter;
 
 /// Main bitmap structure
 pub struct Bitmap {
-    width:  i32,
+    width: i32,
     height: i32,
     pixels: Vec<u8>,
 }
@@ -33,7 +34,7 @@ impl Bitmap {
     }
 
     /// Write the stored data to a file with given filename.
-    pub fn write_to_file(&self, filename: &str) -> io::IoResult<()> {
+    pub fn write_to_file(&self, filename: &str) -> old_io::IoResult<()> {
         const FILE_HEADER_SIZE: usize = 14;
         const BMP_INFO_SIZE: usize = 40;
         const TOTAL_HEADER_SIZE: usize = FILE_HEADER_SIZE + BMP_INFO_SIZE;
@@ -65,14 +66,14 @@ impl Bitmap {
         ];
 
         // Set up the file writer
-        let mut file = io::File::create(&Path::new(filename));
+        let mut file = File::create(&Path::new(filename));
 
         // Write the bitmap headers to file
-        try!(file.write(&file_header));
-        try!(file.write(&info_header));
+        try!(file.write_all(&file_header));
+        try!(file.write_all(&info_header));
 
         // Write data to file
-        file.write(&*self.pixels)
+        file.write_all(&*self.pixels)
     }
 
     /// Get the width of the bitmap.
