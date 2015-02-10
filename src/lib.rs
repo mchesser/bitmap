@@ -73,7 +73,7 @@ impl Bitmap {
         try!(file.write_all(&info_header));
 
         // Write data to file
-        file.write_all(&*self.pixels)
+        file.write_all(&self.pixels)
     }
 
     /// Get the width of the bitmap.
