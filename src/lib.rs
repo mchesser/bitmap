@@ -1,4 +1,3 @@
-#![feature(io)]
 use std::io;
 
 /// Main bitmap structure
